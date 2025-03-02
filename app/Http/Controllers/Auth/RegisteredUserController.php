@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\Permissions\SyncPermissionsAction;
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,7 +24,7 @@ final class RegisteredUserController extends Controller
     /**
      * Show the registration page.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
         return Inertia::render('auth/register');
     }
@@ -28,7 +32,7 @@ final class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -46,8 +50,21 @@ final class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        if (User::count() === 1) {
+            // Sync permissions
+            new SyncPermissionsAction()->handle();
 
-        return to_route('dashboard');
+            // Create super-admin role and assign all permissions
+            $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
+            $superAdminRole->syncPermissions(Permission::all());
+
+            $user->assignRole($superAdminRole);
+
+            Auth::login($user);
+
+            return to_route('dashboard');
+        }
+
+        return to_route('login');
     }
 }

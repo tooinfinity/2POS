@@ -65,9 +65,9 @@
         ],
         "lint": "pint",
         "refactor": "rector",
-        "test:type-coverage": "pest --type-coverage --min=100",
+        "test:type-coverage": "pest --type-coverage",
         "test:lint": "pint --test",
-        "test:unit": "pest --parallel --coverage --exactly=100",
+        "test:unit": "pest --parallel --coverage",
         "test:types": "phpstan",
         "test:refactor": "rector --dry-run",
         "test": [

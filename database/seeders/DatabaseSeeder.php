@@ -20,6 +20,9 @@ final class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+        $permission = Permission::create(['name' => 'register-user']);
+        $role = Role::create(['name' => 'super-admin']);
+        $role->syncPermissions($permission);
 
         $user = User::factory()->create([
             'name' => 'TouwfiQ Meghlaoui',
@@ -28,15 +31,7 @@ final class DatabaseSeeder extends Seeder
             'email_verified_at' => CarbonImmutable::now(),
         ]);
 
-        // create a role super-admin
-        $permission = Permission::create(['name' => 'register-user']);
-        $role = Role::create(['name' => 'super-admin']);
-
-        $role->givePermissionTo($permission);
-        $permission->assignRole($role);
-
-        $user->assignRole('super-admin');
-
+        $user->assignRole($role);
 
     }
 }
