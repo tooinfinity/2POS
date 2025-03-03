@@ -23,7 +23,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property CarbonImmutable $created_at
  * @property CarbonImmutable $updated_at
  *
- * @method static UserFactory factory(array $parameters = [])
+ * @use HasFactory<UserFactory>
  */
 final class User extends Authenticatable implements MustVerifyEmail
 {

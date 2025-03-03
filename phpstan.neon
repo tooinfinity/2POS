@@ -6,6 +6,9 @@ includes:
 parameters:
 
     paths:
-        - app/
+        - app
+        - bootstrap
+        - database/factories
+        - routes
 
-    level: 5
+    level: max
