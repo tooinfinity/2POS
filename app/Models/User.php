@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -48,6 +50,21 @@ final class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
+
+    /**
+     * Determine if there are any users in the database.
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function hasUsers(): bool
+    {
+        if (! app()->has('has_users')) {
+            app()->singleton('has_users', fn (): bool => self::count() > 0);
+        }
+
+        return (bool) app()->get('has_users');
+    }
 
     /** @return array<string, string> */
     protected function casts(): array

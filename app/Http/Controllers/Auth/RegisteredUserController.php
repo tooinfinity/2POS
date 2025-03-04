@@ -35,31 +35,29 @@ final class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        if (User::count() < 1) {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-                'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
 
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->string('password')->value()),
-            ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->string('password')->value()),
+            'email_verified_at' => now(),
+        ]);
 
-            event(new Registered($user));
+        event(new Registered($user));
 
-            $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
-            $superAdminRole->syncPermissions(Permission::all());
+        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
+        $superAdminRole->syncPermissions(Permission::all());
 
-            $user->assignRole($superAdminRole);
+        $user->assignRole($superAdminRole);
 
-            Auth::login($user);
+        Auth::login($user);
 
-            return to_route('dashboard');
-        }
+        return to_route('dashboard');
 
-        return to_route('login');
     }
 }

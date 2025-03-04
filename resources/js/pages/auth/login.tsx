@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import type { SharedData } from '@/types';
+
 
 interface LoginForm {
     email: string;
@@ -19,15 +21,17 @@ interface LoginForm {
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
-    canRegister: boolean;
 }
 
-export default function Login({ status, canResetPassword, canRegister }: LoginProps) {
+
+export default function Login({ status, canResetPassword  }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
         remember: false,
     });
+
+    const { auth } = usePage<SharedData>().props;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -91,7 +95,7 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                     </Button>
                 </div>
 
-                {canRegister && (
+                { auth.canRegister && (
                     <div className="text-muted-foreground text-center text-sm">
                         Don't have an account?{' '}
                         <TextLink href={route('register')} tabIndex={5}>

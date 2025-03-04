@@ -41,16 +41,15 @@ final class HandleInertiaRequests extends Middleware
     #[Override]
     public function share(Request $request): array
     {
-        /** @var array<string, mixed> */
-        $sharedData = [
-            ...parent::share($request),
+        /** @var array<string, mixed> $shared */
+        $shared = array_merge(parent::share($request), [
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
-                'canRegister' => User::count() < 0,
+                'canRegister' => ! User::hasUsers(),
             ],
-        ];
+        ]);
 
-        return $sharedData;
+        return $shared;
     }
 }
