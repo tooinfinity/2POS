@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import type { SharedData } from '@/types';
 
-
 interface LoginForm {
     email: string;
     password: string;
@@ -23,8 +22,7 @@ interface LoginProps {
     canResetPassword: boolean;
 }
 
-
-export default function Login({ status, canResetPassword  }: LoginProps) {
+export default function Login({ status, canResetPassword }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
@@ -95,7 +93,7 @@ export default function Login({ status, canResetPassword  }: LoginProps) {
                     </Button>
                 </div>
 
-                { auth.canRegister && (
+                {auth.canRegister && (
                     <div className="text-muted-foreground text-center text-sm">
                         Don't have an account?{' '}
                         <TextLink href={route('register')} tabIndex={5}>
