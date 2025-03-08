@@ -1,19 +1,24 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { useLanguage } from '@/hooks/use-language';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
+import { useMemo } from 'react';
 
 export default function Dashboard() {
+    const { __ } = useLanguage();
+    const breadcrumbs = useMemo<BreadcrumbItem[]>(
+        () => [
+            {
+                title: __('Dashboard'),
+                href: '/dashboard',
+            },
+        ],
+        [__],
+    );
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title={__('Dashboard')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">

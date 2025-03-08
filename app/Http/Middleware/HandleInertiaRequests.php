@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -41,6 +42,10 @@ final class HandleInertiaRequests extends Middleware
     #[Override]
     public function share(Request $request): array
     {
+        $defaultLocale = config('app.locale');
+        if (! is_string($defaultLocale)) {
+            $defaultLocale = 'en';
+        }
         /** @var array<string, mixed> $shared */
         $shared = array_merge(parent::share($request), [
             'name' => config('app.name'),
@@ -48,6 +53,8 @@ final class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'canRegister' => ! User::hasUsers(),
             ],
+            'locale' => Setting::get('locale', $defaultLocale),
+            'language' => fn (): array => translations(base_path('lang/'.app()->getLocale().'.json')),
         ]);
 
         return $shared;

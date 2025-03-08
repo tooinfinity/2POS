@@ -8,33 +8,14 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
+import { useLanguage } from '@/hooks/use-language';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { useMemo } from 'react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
-
-const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
-];
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -43,6 +24,33 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+    const { __ } = useLanguage();
+    const mainNavItems: NavItem[] = useMemo<NavItem[]>(
+        () => [
+            {
+                title: __('Dashboard'),
+                url: '/dashboard',
+                icon: LayoutGrid,
+            },
+        ],
+        [__],
+    );
+
+    const rightNavItems: NavItem[] = useMemo<NavItem[]>(
+        () => [
+            {
+                title: __('Repository'),
+                url: 'https://github.com/laravel/react-starter-kit',
+                icon: Folder,
+            },
+            {
+                title: __('Documentation'),
+                url: 'https://laravel.com/docs/starter-kits',
+                icon: BookOpen,
+            },
+        ],
+        [__],
+    );
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
