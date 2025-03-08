@@ -21,9 +21,8 @@ use Psr\Container\NotFoundExceptionInterface;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- *
- *
  * @use HasFactory<UserFactory>
+ *
  * @property string $id
  * @property string $name
  * @property string $email
@@ -38,6 +37,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $permissions_count
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
+ *
  * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
@@ -54,6 +54,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|User whereUpdatedAt($value)
  * @method static Builder<static>|User withoutPermission($permissions)
  * @method static Builder<static>|User withoutRole($roles, $guard = null)
+ *
  * @mixin Eloquent
  */
 final class User extends Authenticatable implements MustVerifyEmail

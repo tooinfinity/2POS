@@ -1,10 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
-use Inertia\Testing\AssertableInertia as Assert;
-use Tests\TestCase;
-
-
 
 test('language index is displayed', function () {
     $user = User::factory()->create();
@@ -16,8 +14,8 @@ test('language index is displayed', function () {
     $response->assertOk();
 });
 
-test('default to en when config is not a string', function (){
-   $user = User::factory()->create();
+test('default to en when config is not a string', function () {
+    $user = User::factory()->create();
 
     config(['app.locale' => null]);
 
@@ -34,7 +32,7 @@ test('default to en when config is not a string', function (){
 
 });
 
-test ('can update the language', function () {
+test('can update the language', function () {
     $user = User::factory()->create();
 
     $response = $this

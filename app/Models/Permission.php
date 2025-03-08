@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 
 /**
- *
- *
  * @property string $id
  * @property string $name
  * @property string $guard_name
@@ -25,6 +23,7 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  * @property-read int|null $roles_count
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
+ *
  * @method static Builder<static>|Permission newModelQuery()
  * @method static Builder<static>|Permission newQuery()
  * @method static Builder<static>|Permission permission($permissions, $without = false)
@@ -37,6 +36,7 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  * @method static Builder<static>|Permission whereUpdatedAt($value)
  * @method static Builder<static>|Permission withoutPermission($permissions)
  * @method static Builder<static>|Permission withoutRole($roles, $guard = null)
+ *
  * @mixin Eloquent
  */
 final class Permission extends SpatiePermission

@@ -13,13 +13,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- *
- *
  * @property string $ulid
  * @property string $key
  * @property string $value
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
+ *
  * @method static SettingFactory factory($count = null, $state = [])
  * @method static Builder<static>|Setting newModelQuery()
  * @method static Builder<static>|Setting newQuery()
@@ -29,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder<static>|Setting whereUlid($value)
  * @method static Builder<static>|Setting whereUpdatedAt($value)
  * @method static Builder<static>|Setting whereValue($value)
+ *
  * @mixin Eloquent
  */
 final class Setting extends Model

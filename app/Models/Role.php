@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 /**
- *
- *
  * @property string $id
  * @property string $name
  * @property string $guard_name
@@ -23,6 +21,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
  * @property-read int|null $permissions_count
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
+ *
  * @method static Builder<static>|Role newModelQuery()
  * @method static Builder<static>|Role newQuery()
  * @method static Builder<static>|Role permission($permissions, $without = false)
@@ -33,6 +32,7 @@ use Spatie\Permission\Models\Role as SpatieRole;
  * @method static Builder<static>|Role whereName($value)
  * @method static Builder<static>|Role whereUpdatedAt($value)
  * @method static Builder<static>|Role withoutPermission($permissions)
+ *
  * @mixin Eloquent
  */
 final class Role extends SpatieRole
