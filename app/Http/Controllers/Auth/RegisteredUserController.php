@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\Permissions\CreateRoleAction;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
@@ -33,7 +34,7 @@ final class RegisteredUserController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, CreateRoleAction $action, Role $role, Permission $permission): RedirectResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -50,10 +51,7 @@ final class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
-        $superAdminRole->syncPermissions(Permission::all());
-
-        $user->assignRole($superAdminRole);
+        $action->handle($role, $permission, $user);
 
         Auth::login($user);
 

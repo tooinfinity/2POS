@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 
-test('language index is displayed', function () {
+test('language index is displayed', function (): void {
     $user = User::factory()->create();
 
     $response = $this
@@ -14,7 +14,7 @@ test('language index is displayed', function () {
     $response->assertOk();
 });
 
-test('default to en when config is not a string', function () {
+test('default to en when config is not a string', function (): void {
     $user = User::factory()->create();
 
     config(['app.locale' => null]);
@@ -32,7 +32,7 @@ test('default to en when config is not a string', function () {
 
 });
 
-test('can update the language', function () {
+test('can update the language', function (): void {
     $user = User::factory()->create();
 
     $response = $this
