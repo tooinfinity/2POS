@@ -4,26 +4,21 @@ declare(strict_types=1);
 
 namespace App\Actions\Settings;
 
-use App\Actions\Permissions\UpdateRoleAction;
-use App\Models\Permission;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Throwable;
 
-final readonly class StoreUserAction
+final readonly class StoreUserAction extends AbstractUserAction
 {
-    public function __construct(
-        private UpdateRoleAction $roleAction
-    ) {}
-
     /**
+     * @param  array{name: string, email: string, password: string, role?: string, permissions?: array<int>}  $data
+     *
      * @throws Throwable
      */
     public function handle(array $data): User
     {
-        return DB::transaction(function () use ($data) {
+        return DB::transaction(function () use ($data): User {
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -31,20 +26,7 @@ final readonly class StoreUserAction
                 'email_verified_at' => now(),
             ]);
 
-            if (isset($data['role'])) {
-                $role = Role::where('name', $data['role'])->firstOrFail();
-                $permission = new Permission();
-
-                $this->roleAction->handle(
-                    role: $role,
-                    permission: $permission,
-                    user: $user,
-                    data: [
-                        'role' => $data['role'],
-                        'permissions' => $data['permissions'] ?? [],
-                    ]
-                );
-            }
+            $this->handleRoleAndPermissions($user, $data);
 
             return $user;
         });

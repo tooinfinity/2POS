@@ -4,26 +4,22 @@ declare(strict_types=1);
 
 namespace App\Actions\Settings;
 
-use App\Actions\Permissions\UpdateRoleAction;
-use App\Models\Permission;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use RuntimeException;
 use Throwable;
 
-final readonly class UpdateUserAction
+final readonly class UpdateUserAction extends AbstractUserAction
 {
-    public function __construct(
-        private UpdateRoleAction $roleAction
-    ) {}
-
     /**
+     * @param  array{name: string, email: string, password?: string, role?: string, permissions?: array<int>}  $data
+     *
      * @throws Throwable
      */
     public function handle(User $user, array $data): User
     {
-        return DB::transaction(function () use ($user, $data) {
+        return DB::transaction(function () use ($user, $data): User {
             $updateData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -35,22 +31,15 @@ final readonly class UpdateUserAction
 
             $user->update($updateData);
 
-            if (isset($data['role'])) {
-                $role = Role::where('name', $data['role'])->firstOrFail();
-                $permission = new Permission();
+            $this->handleRoleAndPermissions($user, $data);
 
-                $this->roleAction->handle(
-                    role: $role,
-                    permission: $permission,
-                    user: $user,
-                    data: [
-                        'role' => $data['role'],
-                        'permissions' => $data['permissions'] ?? [],
-                    ]
-                );
+            $freshUser = $user->fresh();
+
+            if ($freshUser === null) {
+                throw new RuntimeException('Failed to refresh user data');
             }
 
-            return $user->fresh();
+            return $freshUser;
         });
     }
 }

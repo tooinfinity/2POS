@@ -4,32 +4,16 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Enums\RoleEnum;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 final class UserPolicy
 {
-    use HandlesAuthorization;
-
-    public function before(?User $user): ?bool
-    {
-        if (! $user instanceof User) {
-            return false;
-        }
-        if ($user->hasRole(RoleEnum::SuperAdministrator->value)) {
-            return true;
-        }
-
-        return null;
-    }
-
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(RoleEnum::SuperAdministrator->value);
+        return $user->hasPermissionTo('view users');
     }
 
     /**
@@ -37,7 +21,7 @@ final class UserPolicy
      */
     public function view(User $user): bool
     {
-        return $user->hasRole(RoleEnum::SuperAdministrator->value);
+        return $user->hasPermissionTo('view users');
     }
 
     /**
@@ -45,24 +29,22 @@ final class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(RoleEnum::SuperAdministrator->value);
+        return $user->hasPermissionTo('create users');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user): bool
     {
-        return $user->hasRole(RoleEnum::SuperAdministrator->value)
-            && ! $model->hasRole(RoleEnum::SuperAdministrator->value);
+        return $user->hasPermissionTo('edit users');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user): bool
     {
-        return $user->hasRole(RoleEnum::SuperAdministrator->value)
-            && ! $model->hasRole(RoleEnum::SuperAdministrator->value);
+        return $user->hasPermissionTo('delete users');
     }
 }

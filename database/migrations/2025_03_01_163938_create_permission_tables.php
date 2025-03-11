@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -109,6 +110,68 @@ return new class extends Migration
 
             $table->primary([$pivotPermission, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
         });
+        // Insert roles
+        DB::table('roles')->insert([
+            [
+                'id' => Str::ulid(),
+                'name' => 'Administrator',
+                'guard_name' => 'web',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => Str::ulid(),
+                'name' => 'Manager',
+                'guard_name' => 'web',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => Str::ulid(),
+                'name' => 'Cashier',
+                'guard_name' => 'web',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        // Insert permissions
+        $permissions = [
+            'view users',
+            'create users',
+            'edit users',
+            'delete users',
+            'view roles',
+            'create roles',
+            'edit roles',
+            'delete roles',
+            'assign roles',
+            'view permissions',
+            'grant permissions',
+            'revoke permissions',
+        ];
+
+        foreach ($permissions as $permission) {
+            DB::table('permissions')->insert([
+                'id' => Str::ulid(),
+                'name' => $permission,
+                'guard_name' => 'web',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Assign permissions to roles
+        $adminRole = DB::table('roles')->where('name', 'Administrator')->first();
+
+        // Assign all permissions to admin
+        $allPermissions = DB::table('permissions')->get();
+        foreach ($allPermissions as $permission) {
+            DB::table('role_has_permissions')->insert([
+                'permission_id' => $permission->id,
+                'role_id' => $adminRole->id,
+            ]);
+        }
 
         app('cache')
             ->store(config('permission.cache.store') !== 'default' ? config('permission.cache.store') : null)

@@ -2522,9 +2522,11 @@ namespace PHPSTORM_META {
 'debugbar.openhandler','debugbar.clockwork','debugbar.assets.css','debugbar.assets.js','debugbar.cache.delete',
 'debugbar.queries.explain','home','dashboard',
 'profile.edit','profile.update','profile.destroy','password.edit','password.update',
-'language','language.update','appearance','register',
-'login','password.request','password.email','password.reset',
-'password.store','verification.notice','verification.verify','verification.send','password.confirm','logout','storage.local',);
+'language','language.update','users.index','users.show','users.create',
+'users.store','users.edit','users.update','users.destroy','appearance',
+'register','login','password.request',
+'password.email','password.reset','password.store','verification.notice','verification.verify',
+'verification.send','password.confirm','logout','storage.local',);
         registerArgumentsSet('views', 
 'app','laravel-exceptions-renderer::components.card','laravel-exceptions-renderer::components.context','laravel-exceptions-renderer::components.editor','laravel-exceptions-renderer::components.header',
 'laravel-exceptions-renderer::components.icons.chevron-down','laravel-exceptions-renderer::components.icons.chevron-up','laravel-exceptions-renderer::components.icons.computer-desktop','laravel-exceptions-renderer::components.icons.moon','laravel-exceptions-renderer::components.icons.sun',
