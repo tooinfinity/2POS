@@ -48,8 +48,7 @@ final class UpdateUserRequest extends FormRequest
                 Rule::unique('users')->ignore($this->route('user')),
             ],
             'password' => [
-                'sometimes',
-                'nullable',
+                'required',
                 'confirmed',
                 Password::min(8)->mixedCase()->numbers()->symbols(),
             ],
@@ -77,26 +76,6 @@ final class UpdateUserRequest extends FormRequest
             'permissions.*.exists' => 'One or more selected permissions are invalid',
             'password.min' => 'Password must be at least 8 characters',
         ];
-    }
-
-    /**
-     * Get the validated password from the request.
-     *
-     * @param  array|int|null|string  $key
-     * @param  mixed  $default
-     * @return array<string, mixed>
-     */
-    #[Override]
-    public function validated($key = null, $default = null): array
-    {
-        /** @var array<string, mixed> $validated */
-        $validated = parent::validated($key, $default);
-
-        if (isset($validated['password']) && empty($validated['password'])) {
-            unset($validated['password']);
-        }
-
-        return $validated;
     }
 
     protected function prepareForValidation(): void

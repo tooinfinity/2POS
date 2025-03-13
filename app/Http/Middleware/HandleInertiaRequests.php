@@ -52,6 +52,7 @@ final class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'canRegister' => ! User::hasUsers(),
+                'canUsersResource' => $request->user() ? $request->user()->hasRole('Administrator') : false,
             ],
             'locale' => Setting::get('locale', $defaultLocale),
             'language' => fn (): array => translations(base_path('lang/'.app()->getLocale().'.json')),

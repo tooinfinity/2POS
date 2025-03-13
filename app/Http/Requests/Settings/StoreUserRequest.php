@@ -45,7 +45,7 @@ final class StoreUserRequest extends FormRequest
             'role' => [
                 'required',
                 'string',
-                Rule::exists('roles', 'name')->whereNot('name', RoleEnum::Administrator->value),
+                Rule::exists('roles', 'name'),
             ],
             'permissions' => ['sometimes', 'array'],
             'permissions.*' => ['exists:permissions,id'],

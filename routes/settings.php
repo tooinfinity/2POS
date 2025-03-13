@@ -24,9 +24,9 @@ Route::middleware(['auth'])->group(function (): void {
 
     Route::middleware(['role:'.App\Enums\RoleEnum::Administrator->value])->group(function (): void {
         Route::get('settings/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('settings/users/{user}', [UserController::class, 'show'])->name('users.show');
         Route::get('settings/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('settings/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('settings/users/{user}', [UserController::class, 'show'])->name('users.show');
         Route::get('settings/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
         Route::put('settings/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('settings/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');

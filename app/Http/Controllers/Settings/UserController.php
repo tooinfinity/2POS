@@ -6,14 +6,12 @@ namespace App\Http\Controllers\Settings;
 
 use App\Actions\Settings\StoreUserAction;
 use App\Actions\Settings\UpdateUserAction;
-use App\Enums\RoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\StoreUserRequest;
 use App\Http\Requests\Settings\UpdateUserRequest;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,16 +19,9 @@ use Throwable;
 
 final class UserController extends Controller
 {
-    use AuthorizesRequests;
-
-    public function __construct()
-    {
-        $this->authorizeResource(User::class, 'user');
-    }
-
     public function index(): Response
     {
-        return Inertia::render('Settings/Users/Index', [
+        return Inertia::render('settings/users/index', [
             'users' => User::with(['roles', 'permissions'])
                 ->latest()
                 ->paginate(10)
@@ -41,14 +32,12 @@ final class UserController extends Controller
                     'roles' => $user->roles->pluck('name'),
                     'permissions' => $user->permissions->pluck('name'),
                 ]),
-            'roles' => Role::all(['id', 'name']),
-            'permissions' => Permission::all(['id', 'name']),
         ]);
     }
 
     public function show(User $user): Response
     {
-        return Inertia::render('Settings/User', [
+        return Inertia::render('settings/users/show', [
             'user' => $user,
             'role' => $user->roles->first(),
             'permissions' => $user->permissions,
@@ -57,11 +46,24 @@ final class UserController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Settings/Users/Create', [
-            'roles' => Role::where('name', '!=', RoleEnum::Administrator->value)
-                ->get(['id', 'name']),
-            'permissions' => Permission::get(['id', 'name'])
-                ->groupBy('group'),
+        $permissions = Permission::all(['id', 'name'])
+            ->map(function ($permission): array {
+
+                $model = explode(' ', (string) $permission->name)[1] ?? 'other';
+
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'model' => ucfirst($model),
+                ];
+            });
+        $roles = Role::with('permissions')->get();
+        $rolePermissions = $roles->mapWithKeys(fn($role) => [$role->name => $role->permissions->pluck('name')]);
+
+        return Inertia::render('settings/users/create', [
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'rolePermissions' => $rolePermissions,
         ]);
     }
 
@@ -81,7 +83,7 @@ final class UserController extends Controller
 
     public function edit(User $user): Response
     {
-        return Inertia::render('Settings/Users/Edit', [
+        return Inertia::render('Settings/users/edit', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -116,7 +118,7 @@ final class UserController extends Controller
 
         $user->delete();
 
-        return to_route('settings.users.index')
+        return to_route('users.index')
             ->with('success', 'User deleted successfully.');
     }
 }
