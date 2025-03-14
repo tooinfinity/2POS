@@ -1,18 +1,17 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { BreadcrumbItem } from '@/types';
 import { useLanguage } from '@/hooks/use-language';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ModelSelect } from '@/components/ui/model-select';
 import { router } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { RolePermission } from '@/components/role-permission';
 
 interface Props {
     roles: {
@@ -24,22 +23,52 @@ interface Props {
         name: string;
         model?: string;
     }[];
-    rolePermissions: {
-        role: string;
-        permissions: string[];
-    }[];
+    rolePermissions: Record<string, string[]>;
+}
+
+interface FormData {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+    role: string;
+    permissions: string[];
 }
 
 export default function Create({ roles, permissions, rolePermissions }: Props) {
     const { __ } = useLanguage();
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm<FormData>({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
         role: '',
-        permission: '',
+        permissions: [],
     });
+
+    const formattedRolePermissions = useMemo(() => {
+        if (!rolePermissions || typeof rolePermissions !== "object") {
+            console.error("❌ rolePermissions is not an object:", rolePermissions);
+            return {};
+        }
+
+        console.log("📥 Received rolePermissions:", rolePermissions);
+
+        return Object.entries(rolePermissions).reduce((acc, [role, permissions]) => {
+            acc[role] = permissions || [];
+            return acc;
+        }, {} as Record<string, string[]>);
+    }, [rolePermissions]);
+
+    console.log("🔍 Converted rolePermissions:", formattedRolePermissions);
+
+    const handleRoleChange = useCallback((value: string) => {
+        setData((prev) => ({
+            ...prev,
+            role: value,
+            permissions: [...new Set([...formattedRolePermissions[value] || []])], // Auto-check role permissions
+        }));
+    }, [formattedRolePermissions, setData]);
 
     const breadcrumbs = useMemo<BreadcrumbItem[]>(
         () => [
@@ -142,41 +171,19 @@ export default function Create({ roles, permissions, rolePermissions }: Props) {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="role">{__('Role')}</Label>
-                                <Select value={data.role} onValueChange={(value) => setData('role', value)}>
-                                    <SelectTrigger className={cn(errors.role && "border-destructive")}>
-                                        <SelectValue placeholder={__('Select a role')} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {roles.map((role) => (
-                                            <SelectItem key={role.id} value={role.name}>
-                                                {role.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                {errors.role && (
-                                    <p className="text-sm text-destructive">{errors.role}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="permissions">{__('Permissions')}</Label>
-                                <ModelSelect
-                                    value={data.permission}
-                                    onValueChange={(value) => setData('permission', value)}
-                                    options={permissions.map((permission) => ({
-                                        value: permission.name,
-                                        label: permission.name,
-                                        model: permission.model || 'Other',
-                                    }))}
-                                    placeholder={__('Select permission')}
-                                    error={errors.permission}
-                                    rolePermissions={rolePermissions}
-                                    selectedRole={data.role}
-                                />
-                            </div>
+                            <RolePermission
+                                role={data.role}
+                                permissions={data.permissions}
+                                onRoleChange={handleRoleChange}
+                                onPermissionsChange={(value) => setData('permissions', value)}
+                                roles={roles}
+                                permissionOptions={permissions}
+                                rolePermissions={formattedRolePermissions}
+                                errors={{
+                                    role: errors.role,
+                                    permissions: errors.permissions
+                                }}
+                            />
 
                             <div className="flex justify-end gap-4">
                                 <Button

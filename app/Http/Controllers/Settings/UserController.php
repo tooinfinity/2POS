@@ -46,24 +46,18 @@ final class UserController extends Controller
 
     public function create(): Response
     {
-        $permissions = Permission::all(['id', 'name'])
-            ->map(function ($permission): array {
-
-                $model = explode(' ', (string) $permission->name)[1] ?? 'other';
-
-                return [
-                    'id' => $permission->id,
-                    'name' => $permission->name,
-                    'model' => ucfirst($model),
-                ];
-            });
-        $roles = Role::with('permissions')->get();
-        $rolePermissions = $roles->mapWithKeys(fn($role) => [$role->name => $role->permissions->pluck('name')]);
-
         return Inertia::render('settings/users/create', [
-            'roles' => $roles,
-            'permissions' => $permissions,
-            'rolePermissions' => $rolePermissions,
+            'roles' => Role::all()->map(fn ($role): array => [
+                'id' => $role->id,
+                'name' => $role->name,
+            ]),
+            'permissions' => Permission::all()->map(fn ($perm): array => [
+                'id' => $perm->id,
+                'name' => $perm->name,
+            ]),
+            'rolePermissions' => Role::with('permissions')->get()->mapWithKeys(fn ($role) => [
+                $role->name => $role->permissions->pluck('name')->toArray(),
+            ])->toArray(),
         ]);
     }
 
@@ -83,16 +77,35 @@ final class UserController extends Controller
 
     public function edit(User $user): Response
     {
-        return Inertia::render('Settings/users/edit', [
+        $roles = Role::all()->map(fn ($role): array => [
+            'id' => $role->id,
+            'name' => $role->name,
+        ]);
+
+        $permissions = Permission::all()->map(fn ($perm): array => [
+            'id' => $perm->id,
+            'name' => $perm->name,
+        ]);
+
+        $userRoles = $user->roles->pluck('name')->toArray();
+
+        $userPermissions = $user->getDirectPermissions()->pluck('name')->toArray();
+
+        $rolePermissions = Role::with('permissions')->get()->mapWithKeys(fn ($role) => [
+            $role->name => $role->permissions->pluck('name')->toArray(),
+        ])->toArray();
+
+        return Inertia::render('settings/users/edit', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'roles' => $user->roles->pluck('name'),
-                'permissions' => $user->permissions->pluck('id'),
+                'roles' => $userRoles,
+                'permissions' => $userPermissions,
             ],
-            'roles' => Role::all(['id', 'name']),
-            'permissions' => Permission::all(['id', 'name']),
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'rolePermissions' => $rolePermissions,
         ]);
     }
 
